@@ -18,39 +18,38 @@ type DingDing struct {
 }
 
 type DingDingData struct {
-	Msgtype string `json:"msgtype"`
+	Msgtype  string                  `json:"msgtype"`
 	Markdown DingDingApiMarkDownData `json:"markdown"`
-  At At `json:"at"`
+	At       At                      `json:"at"`
 }
 
 type At struct {
-  AtMobiles []string `json:"atMobiles,omitempty"`
-  IsAtAll   bool     `json:"isAtAll"`
+	AtMobiles []string `json:"atMobiles,omitempty"`
+	IsAtAll   bool     `json:"isAtAll"`
 }
 
 type DingDingApiMarkDownData struct {
-	Title string  `json:"title"`
-	Text string   `json:"text"`
- 
+	Title string `json:"title"`
+	Text  string `json:"text"`
 }
 
 // 钉钉通知, 频率限制 1分钟20次
 // https://open.dingtalk.com/document/orgapp/the-robot-sends-a-group-message
 func DingDingApi(content string) {
 	// 放到单独执行，避免主进程阻塞(没有 block 程序时不会执行)
-	go func () {
+	go func() {
 		url := "https://oapi.dingtalk.com/robot/send?access_token=" + dingding_token
-	
+
 		requestBody := DingDingData{
 			Msgtype: "markdown",
-			Markdown: DingDingApiMarkDownData {
+			Markdown: DingDingApiMarkDownData{
 				Title: dingding_word,
-				Text: content,
+				Text:  content,
 			},
-      At: At {
-        AtMobiles: []string{},
-        IsAtAll: true,
-      },
+			At: At{
+				AtMobiles: []string{},
+				IsAtAll:   true,
+			},
 		}
 		jsonData, _ := json.Marshal(requestBody)
 		fmt.Println(string(jsonData))
@@ -87,12 +86,10 @@ func DingDingApi(content string) {
 }
 
 func (pusher DingDing) TestPusher() {
-  text := `
+	text := `
 ## Test
-#### push test success
-
-> author <sorry510sf@gmail.com>`
-  DingDingApi(text)
+#### push test success`
+	DingDingApi(text)
 }
 
 func (pusher DingDing) FuturesOpenOrder(params FuturesOrderParams) {
@@ -105,19 +102,17 @@ func (pusher DingDing) FuturesOpenOrder(params FuturesOrderParams) {
 #### **{futures.leverage}**：<font color="#008000">%f</font>
 #### **{futures.status}**：<font color="%s">%s</font>
 #### **{futures.error}**：<font color="#FF0000">%s</font>
-#### **{futures.time}**：%s
-
-> author <sorry510sf@gmail.com>`
+#### **{futures.time}**：%s`
 
 	text = fmt.Sprintf(lang.LangMatch(text),
-		params.Symbol + params.Title,
-		lang.Lang("futures." + params.Side),
-		lang.Lang("futures." + params.PositionSide),
-    params.Price,
-    params.Quantity,
-    params.Leverage,
-    getStatusColor(params.Status), lang.Lang("futures." + params.Status),
-    params.Error,
+		params.Symbol+params.Title,
+		lang.Lang("futures."+params.Side),
+		lang.Lang("futures."+params.PositionSide),
+		params.Price,
+		params.Quantity,
+		params.Leverage,
+		getStatusColor(params.Status), lang.Lang("futures."+params.Status),
+		params.Error,
 		nowTime(),
 	)
 	DingDingApi(text)
@@ -135,21 +130,19 @@ func (pusher DingDing) FuturesCloseOrder(params FuturesOrderParams) {
 #### **{futures.remarks}**：<font color="#FF0000">%s</font>
 #### **{futures.status}**：<font color="%s">%s</font>
 #### **{futures.error}**：<font color="#FF0000">%s</font>
-#### **{futures.time}**：%s
-
-> author <sorry510sf@gmail.com>`
+#### **{futures.time}**：%s`
 
 	text = fmt.Sprintf(lang.LangMatch(text),
-		params.Symbol + params.Title,
-		lang.Lang("futures." + params.Side),
-		lang.Lang("futures." + params.PositionSide),
-    params.Price,
-    params.Quantity,
-    params.Leverage,
-    params.Profit,
-    params.Remarks,
-    getStatusColor(params.Status), lang.Lang("futures." + params.Status),
-    params.Error,
+		params.Symbol+params.Title,
+		lang.Lang("futures."+params.Side),
+		lang.Lang("futures."+params.PositionSide),
+		params.Price,
+		params.Quantity,
+		params.Leverage,
+		params.Profit,
+		params.Remarks,
+		getStatusColor(params.Status), lang.Lang("futures."+params.Status),
+		params.Error,
 		nowTime(),
 	)
 	DingDingApi(text)
@@ -162,19 +155,17 @@ func (pusher DingDing) FuturesNotice(params FuturesNoticeParams) {
 #### **{futures.position_side}**：<font color="#008000">%s</font>
 #### **{futures.price}**：<font color="#008000">%f</font>
 #### **{futures.auto_order}**：<font color="#008000">%s</font>
-#### **{futures.time}**：%s
+#### **{futures.time}**：%s`
 
-> author <sorry510sf@gmail.com>`
-
-  text = fmt.Sprintf(lang.LangMatch(text),
-    params.Symbol + params.Title,
-    lang.Lang("futures." + params.Side),
-    lang.Lang("futures." + params.PositionSide),
-    params.Price,
-    params.AutoOrder,
-    nowTime(),
-  )
-  DingDingApi(text)
+	text = fmt.Sprintf(lang.LangMatch(text),
+		params.Symbol+params.Title,
+		lang.Lang("futures."+params.Side),
+		lang.Lang("futures."+params.PositionSide),
+		params.Price,
+		params.AutoOrder,
+		nowTime(),
+	)
+	DingDingApi(text)
 }
 
 func (pusher DingDing) FuturesListenKlineBase(params FuturesListenParams) {
@@ -183,18 +174,16 @@ func (pusher DingDing) FuturesListenKlineBase(params FuturesListenParams) {
 #### **{futures.change_percent}**：<font color="#008000">%.6f</font>
 #### **{futures.price}**：<font color="#008000">%f</font>
 #### **{futures.remarks}**：<font color="#008000">%s</font>
-#### **{futures.time}**：%s
+#### **{futures.time}**：%s`
 
-> author <sorry510sf@gmail.com>`
-
-  text = fmt.Sprintf(lang.LangMatch(text),
-    params.Symbol + params.Title,
-    params.ChangePercent,
-    params.Price,
-    params.Remarks,
-    nowTime(),
-  )
-  DingDingApi(text)
+	text = fmt.Sprintf(lang.LangMatch(text),
+		params.Symbol+params.Title,
+		params.ChangePercent,
+		params.Price,
+		params.Remarks,
+		nowTime(),
+	)
+	DingDingApi(text)
 }
 
 func (pusher DingDing) FuturesListenKlineKc(params FuturesListenParams) {
@@ -206,21 +195,19 @@ func (pusher DingDing) FuturesListenKlineKc(params FuturesListenParams) {
 #### **{futures.target_half_profit_price}**：<font color="#008000">%f</font>
 #### **{futures.target_all_profit_price}**：<font color="#008000">%f</font>
 #### **{futures.desired_price}**：<font color="#008000">%f</font>
-#### **{futures.time}**：%s
+#### **{futures.time}**：%s`
 
-> author <sorry510sf@gmail.com>`
-
-  text = fmt.Sprintf(lang.LangMatch(text),
-    params.Symbol + params.Title,
-    lang.Lang("futures." + params.PositionSide),
-    params.NowPrice,
-    params.StopLossPrice,
-    params.TargetHalfProfitPrice,
-    params.TargetAllProfitPrice,
-    params.DesiredPrice,
-    nowTime(),
-  )
-  DingDingApi(text)
+	text = fmt.Sprintf(lang.LangMatch(text),
+		params.Symbol+params.Title,
+		lang.Lang("futures."+params.PositionSide),
+		params.NowPrice,
+		params.StopLossPrice,
+		params.TargetHalfProfitPrice,
+		params.TargetAllProfitPrice,
+		params.DesiredPrice,
+		nowTime(),
+	)
+	DingDingApi(text)
 }
 
 func (pusher DingDing) FuturesListenKlineCustom(params FuturesListenParams) {
@@ -231,19 +218,17 @@ func (pusher DingDing) FuturesListenKlineCustom(params FuturesListenParams) {
 #### **{futures.strategy_name}**：<font color="#008000">%s</font>
 #### **{futures.time}**：%s
 
-> <font color="#008000">%s</font>
+> <font color="#008000">%s</font>`
 
-> author <sorry510sf@gmail.com>`
-
-  text = fmt.Sprintf(lang.LangMatch(text),
-    params.Symbol + params.Title,
-    lang.Lang("futures." + params.PositionSide),
-    params.NowPrice,
-    params.StrategyName,
-    nowTime(),
-    params.Remarks,
-  )
-  DingDingApi(text)
+	text = fmt.Sprintf(lang.LangMatch(text),
+		params.Symbol+params.Title,
+		lang.Lang("futures."+params.PositionSide),
+		params.NowPrice,
+		params.StrategyName,
+		nowTime(),
+		params.Remarks,
+	)
+	DingDingApi(text)
 }
 
 func (pusher DingDing) FuturesListenFundingRate(params FuturesListenParams) {
@@ -253,19 +238,17 @@ func (pusher DingDing) FuturesListenFundingRate(params FuturesListenParams) {
 #### **{futures.funding_rate}**：<font color="#008000">%.2f%%</font>
 #### **{futures.price}**：<font color="#008000">%f</font>
 #### **{futures.remarks}**：<font color="#008000">%s</font>
-#### **{futures.time}**：%s
+#### **{futures.time}**：%s`
 
-> author <sorry510sf@gmail.com>`
-
-  text = fmt.Sprintf(lang.LangMatch(text),
-    params.Symbol + params.Title,
-    lang.Lang("futures." + params.PositionSide),
-    params.FundingRate,
-    params.Price,
-    params.Remarks,
-    nowTime(),
-  )
-  DingDingApi(text)
+	text = fmt.Sprintf(lang.LangMatch(text),
+		params.Symbol+params.Title,
+		lang.Lang("futures."+params.PositionSide),
+		params.FundingRate,
+		params.Price,
+		params.Remarks,
+		nowTime(),
+	)
+	DingDingApi(text)
 }
 
 func (pusher DingDing) SpotOrder(params SpotOrderParams) {
@@ -277,20 +260,18 @@ func (pusher DingDing) SpotOrder(params SpotOrderParams) {
 #### **{spot.remarks}**：<font color="#FF0000">%s</font>
 #### **{spot.status}**：<font color="%s">%s</font>
 #### **{spot.error}**：<font color="#FF0000">%s</font>
-#### **{spot.time}**：%s
-
-> author <sorry510sf@gmail.com>`
-  text = fmt.Sprintf(lang.LangMatch(text),
-    params.Symbol + params.Title,
-    lang.Lang("spot." + params.Side),
-    params.Price,
-    params.Quantity,
-    params.Remarks,
-    getStatusColor(params.Status), lang.Lang("spot." + params.Status),
-    params.Error,
-    nowTime(),
-  )
-  DingDingApi(text)
+#### **{spot.time}**：%s`
+	text = fmt.Sprintf(lang.LangMatch(text),
+		params.Symbol+params.Title,
+		lang.Lang("spot."+params.Side),
+		params.Price,
+		params.Quantity,
+		params.Remarks,
+		getStatusColor(params.Status), lang.Lang("spot."+params.Status),
+		params.Error,
+		nowTime(),
+	)
+	DingDingApi(text)
 }
 
 func (pusher DingDing) SpotNotice(params SpotNoticeParams) {
@@ -299,18 +280,16 @@ func (pusher DingDing) SpotNotice(params SpotNoticeParams) {
 #### **{spot.side}**：<font color="#008000">%s</font>
 #### **{spot.price}**：<font color="#008000">%f</font>
 #### **{spot.auto_order}**：<font color="#008000">%s</font>
-#### **{spot.time}**：%s
+#### **{spot.time}**：%s`
 
-> author <sorry510sf@gmail.com>`
-
-  text = fmt.Sprintf(lang.LangMatch(text),
-    params.Symbol + params.Title,
-    lang.Lang("spot." + params.Side),
-    params.Price,
-    params.AutoOrder,
-    nowTime(),
-  )
-  DingDingApi(text)
+	text = fmt.Sprintf(lang.LangMatch(text),
+		params.Symbol+params.Title,
+		lang.Lang("spot."+params.Side),
+		params.Price,
+		params.AutoOrder,
+		nowTime(),
+	)
+	DingDingApi(text)
 }
 
 func (pusher DingDing) SpotListenKlineBase(params SpotListenParams) {
@@ -319,18 +298,16 @@ func (pusher DingDing) SpotListenKlineBase(params SpotListenParams) {
 #### **{spot.change_percent}**：<font color="#008000">%.6f</font>
 #### **{spot.price}**：<font color="#008000">%f</font>
 #### **{spot.remarks}**：<font color="#008000">%s</font>
-#### **{spot.time}**：%s
+#### **{spot.time}**：%s`
 
-> author <sorry510sf@gmail.com>`
-
-  text = fmt.Sprintf(lang.LangMatch(text),
-    params.Symbol + params.Title,
-    params.ChangePercent,
-    params.Price,
-    params.Remarks,
-    nowTime(),
-  )
-  DingDingApi(text)
+	text = fmt.Sprintf(lang.LangMatch(text),
+		params.Symbol+params.Title,
+		params.ChangePercent,
+		params.Price,
+		params.Remarks,
+		nowTime(),
+	)
+	DingDingApi(text)
 }
 
 func (pusher DingDing) FuturesCustomStrategyTest(params FuturesTestParams) {
@@ -346,46 +323,42 @@ func (pusher DingDing) FuturesCustomStrategyTest(params FuturesTestParams) {
 #### **{futures.strategy_name}**：<font color="#008000">%s</font>
 #### **{futures.time}**：%s
 
-> <font color="#008000">%s</font>
+> <font color="#008000">%s</font>`
 
-> author <sorry510sf@gmail.com>`
-
-  text = fmt.Sprintf(lang.LangMatch(text),
-    params.Symbol + params.Title,
-    lang.Lang("futures." + params.Type),
-    lang.Lang("futures." + params.PositionSide),
-    params.Price,
-    params.ClosePrice,
-    params.Quantity,
-    params.Leverage,
-    params.Profit,
-    params.StrategyName,
-    nowTime(),
-    params.Remarks,
-  )
-  DingDingApi(text)
+	text = fmt.Sprintf(lang.LangMatch(text),
+		params.Symbol+params.Title,
+		lang.Lang("futures."+params.Type),
+		lang.Lang("futures."+params.PositionSide),
+		params.Price,
+		params.ClosePrice,
+		params.Quantity,
+		params.Leverage,
+		params.Profit,
+		params.StrategyName,
+		nowTime(),
+		params.Remarks,
+	)
+	DingDingApi(text)
 }
 
 func (pusher DingDing) FuturesPositionConvert(params FuturesPositionConvertParams) {
-  text := `
+	text := `
 ## %s
 #### **{futures.status}**：<font color="#008000">%s</font>
 #### **{futures.position_side}**：<font color="#008000">%s</font>
 #### **{futures.now_price}**：<font color="#008000">%s</font>
 #### **{futures.leverage}**：<font color="#008000">%s</font>
 #### **{futures.profit}**：<font color="#008000">%s</font>
-#### **{futures.time}**：%s
+#### **{futures.time}**：%s`
 
-> author <sorry510sf@gmail.com>`
-
-  text = fmt.Sprintf(lang.LangMatch(text),
-    params.Symbol + params.Title,
-    lang.Lang("futures." + params.Status),
-    lang.Lang("futures." + params.PositionSide),
-    params.Price,
-    params.Leverage,
-    params.UnRealizedProfit,
-    nowTime(),
-  )
-  DingDingApi(text)
+	text = fmt.Sprintf(lang.LangMatch(text),
+		params.Symbol+params.Title,
+		lang.Lang("futures."+params.Status),
+		lang.Lang("futures."+params.PositionSide),
+		params.Price,
+		params.Leverage,
+		params.UnRealizedProfit,
+		nowTime(),
+	)
+	DingDingApi(text)
 }
